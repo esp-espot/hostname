@@ -13,8 +13,10 @@ pub fn get() -> io::Result<OsString> {
     // host names are limited to `HOST_NAME_MAX` bytes
     //
     // https://pubs.opengroup.org/onlinepubs/9699919799/functions/gethostname.html
-    let size =
-        unsafe { libc::sysconf(libc::_SC_HOST_NAME_MAX) as libc::size_t };
+    #[cfg(not(target_os = "espidf"))]
+    let size = unsafe { libc::sysconf(libc::_SC_HOST_NAME_MAX) as libc::size_t };
+    #[cfg(target_os = "espidf")]
+    let size = 128 as libc::size_t;
 
     let mut buffer = vec![0u8; size];
 
